@@ -35,5 +35,6 @@ python run_bcy.py --start_date="20220610" --end_date="20230610" --target_dir="js
 
 export bcy json files as a single csv / parquet file:
 ```bash
-python bcy_json_runner.py D:\CSC\pathfinder\scripts\results
+# saves to <curr_dir>/bcy_2015_2019.parquet
+python write_bcy.py D:\CSC\pathfinder\bcy_2015_2019
 ```

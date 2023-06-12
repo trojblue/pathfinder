@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 from pathfinder.bcy import BcyWriter
 
-def run(in_dir: str, out_dir:str=None, use_parquet: bool = True):
+
+def run(in_dir: str, out_dir: str = None, use_parquet: bool = True):
     """
     Parse a single JSON file or all JSON files in a directory and save the data to a CSV file.
     :param in_dir: Path to the JSON file, or directory containing jsons
@@ -21,6 +22,7 @@ def run(in_dir: str, out_dir:str=None, use_parquet: bool = True):
 
     # Parse the JSON files and save the results
     writer.parse_and_save(use_parquet=use_parquet)
+
 
 if __name__ == "__main__":
     # python script_name.py --directory "path_to_directory" --output_file "output.csv"

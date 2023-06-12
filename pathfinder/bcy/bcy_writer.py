@@ -7,6 +7,7 @@ from pathfinder.bcy import BcyJsonParser
 import pandas as pd
 import polars as pl
 
+
 class BcyWriter:
     def __init__(self, directory: str, output_file: str):
         self.directory = directory
@@ -32,7 +33,7 @@ class BcyWriter:
 
     @staticmethod
     def _sanitize(value: str) -> str:
-        return ''.join(char for char in value if char.isprintable())
+        return "".join(char for char in value if char.isprintable())
 
     def save_dict_to_csv(self, data_dict: Dict[str, Dict[str, Union[str, int, float]]]):
         if not data_dict:
@@ -42,7 +43,9 @@ class BcyWriter:
         with open(self.output_file, "w", newline="", encoding="utf-8") as csvfile:
             if data_dict:
                 header = ["date_rank"] + list(next(iter(data_dict.values())).keys())
-                writer = csv.DictWriter(csvfile, fieldnames=header, quoting=csv.QUOTE_ALL)
+                writer = csv.DictWriter(
+                    csvfile, fieldnames=header, quoting=csv.QUOTE_ALL
+                )
                 writer.writeheader()
                 for date_rank, row in data_dict.items():
                     row["date_rank"] = date_rank
@@ -56,16 +59,18 @@ class BcyWriter:
         """
         if data_dict:
             # Convert the dictionary to a pandas DataFrame first
-            df_pandas = pd.DataFrame.from_dict(data_dict, orient='index').reset_index()
+            df_pandas = pd.DataFrame.from_dict(data_dict, orient="index").reset_index()
 
             # Rename the 'index' column to 'date_rank'
-            df_pandas.rename(columns={'index': 'date_rank'}, inplace=True)
+            df_pandas.rename(columns={"index": "date_rank"}, inplace=True)
 
             # Then convert pandas DataFrame to Polars DataFrame
             df = pl.from_pandas(df_pandas)
 
             # Rearrange the columns to have 'date_rank' first
-            df = df.select(['date_rank'] + [col for col in df.columns if col != 'date_rank'])
+            df = df.select(
+                ["date_rank"] + [col for col in df.columns if col != "date_rank"]
+            )
 
             # Write the DataFrame to a Parquet file
             df.write_parquet(parquet_file)
