@@ -26,7 +26,7 @@ def main(
 
     parameters = []
     for single_date in daterange(start_datetime, end_datetime):
-        for page in range(1, 5):  # pages 1 through 4
+        for page in range(1, 9):  # pages 1 through 8
             params = {
                 "p": str(page),
                 "ttype": "illust",
