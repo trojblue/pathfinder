@@ -4,7 +4,7 @@ def try_get_page():
     url = "https://bcy.net/illust/toppost100?type=week&date=20230612"
 
     # You need to have the correct WebDriver executable (geckodriver for Firefox) in your PATH
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
 
     driver.get(url)
 

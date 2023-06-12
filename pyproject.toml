@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pathfinder"
+version = "0.1.0"
+description = "pathfinder is a tool that finds where to scrape"
+authors = ["yada <trojblue@gmail.com>"]
+license = "GPL-3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+selenium = "^4.10.0"
+requests = "^2.31.0"
+simplejson = "^3.19.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
