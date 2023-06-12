@@ -1,119 +1,34 @@
 import re
 import json
-import codecs
-import re
-import json
+from selenium import webdriver
 
 
-def get_data():
-    # let's assume html is your HTML string
+def try_get_page():
+    url = "https://bcy.net/illust/toppost100?type=week&date=20230612"
 
-    # read html from file
-    with open("test.html", "r", encoding="utf-8") as f:
-        html = f.read()
+    # You need to have the correct WebDriver executable (geckodriver for Firefox) in your PATH
+    driver = webdriver.Chrome()
 
-    pattern = r'window\.__ssr_data\s=\sJSON.parse\("(.*?)"\)'
+    driver.get(url)
 
-    match = re.search(pattern, html)
-    if match:
-        json_string = match.group(1)
-        # Unescape backslashes in the extracted string.
-        json_string = json_string.replace('\\\\', '\\')
-        data = json.loads(json_string)
-        print(data)
+    # Wait for JavaScript to execute and modify the HTML
+    # You may need to wait for more than 5 seconds depending on the site
+    driver.implicitly_wait(5)
 
+    html = driver.page_source
 
-def get_data2():
-    with open("test.html", "r", encoding="utf-8") as f:
-        html = f.read()
+    # Save the resulting HTML to a file
+    with open("test.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
-    pattern = r'window\.__ssr_data\s=\sJSON.parse\("(.*?)"\)'
-    match = re.search(pattern, html)
-
-    if match:
-        json_string = match.group(1)
-        json_string = codecs.decode(json_string, 'unicode_escape')
-        json_string = json_string.replace('\\\\', '\\')
-        json_string = json_string.replace('\\"', '"')
-
-        try:
-            data = json.loads(json_string)
-            print(data)
-        except json.JSONDecodeError as e:
-            print(f"JSONDecodeError: {e}")
-
-def process_dict(d):
-    new_dict = {}
-    for k, v in d.items():
-        if isinstance(v, str):
-            new_dict[k] = bytes(v, 'latin1').decode('unicode_escape')
-        elif isinstance(v, dict):
-            new_dict[k] = process_dict(v)
-        else:
-            new_dict[k] = v
-    return new_dict
-
-def try_parse():
-    data = get_data2()
-    # Convert dictionary to JSON string
-    data2 = process_dict(data)
-    json_str = json.dumps(data)
-
-    # Convert JSON string to byte string
-    byte_str = json_str.encode('utf-8')
-
-    # Decode byte string to normal utf-8 string
-    utf8_str = byte_str.decode('unicode_escape')
-
-    # Convert utf-8 string back to dictionary
-    decoded_dict = json.loads(utf8_str)
-
-    print("D")
+    driver.quit()
 
 
-import json
-import simplejson
-import simplejson.errors
-import re
-
-
-def get_data3():
-    # read html from file
-    with open("test.html", "r", encoding="utf-8") as f:
-        html = f.read()
-
-    pattern = r'window\.__ssr_data\s=\sJSON.parse\("(.*?)"\)'
-    match = re.search(pattern, html)
-
-    if match:
-        json_string = match.group(1)
-        # Unescape backslashes in the extracted string.
-        json_string = json_string.replace('\\\\', '\\')
-
-        # Attempt to parse the JSON string using the built-in json library
-        try:
-            data = json.loads(json_string)
-            print(data)
-        except json.JSONDecodeError as e:
-            # If parsing fails, attempt to parse it using simplejson
-            try:
-                data = simplejson.loads(json_string)
-                print(data)
-            except simplejson.errors.JSONDecodeError as e:
-                print('Failed to decode JSON:', str(e))
-
-
-
-import codecs
 def convert_unicode_chars(input_string):
     return re.sub(r'\\\\u([0-9a-fA-F]{4})', lambda x: chr(int(x.group(1), 16)), input_string)
 
 
-
-def get_data4():
-
-
-
+def get_data():
     with open("test.html", "r", encoding="utf-8") as f:
         html = f.read()
 
@@ -139,13 +54,14 @@ def get_data4():
         with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-
-
     else:
         print("No JSON string found.")
 
 
+def try_chain():
+    try_get_page()
+    get_data()
 
 
 if __name__ == '__main__':
-    get_data4()
+    try_chain()

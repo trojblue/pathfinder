@@ -13,27 +13,5 @@ def try_get_page():
 
 
 
-
-def load2():
-    import json
-
-    json_string = """
-    {
-       \"user\":{
-          \"uid\":\"0\",
-          \"area\":{}
-       }
-    }
-    """
-
-    # Convert the JSON string to a Python dictionary
-    data = json.loads(json_string)
-
-    # Now `data` is a Python dict
-    print(data)
-
-    json_object = json.loads(json_string)
-
-
 if __name__ == '__main__':
     try_get_page()

@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.10"
 selenium = "^4.10.0"
 requests = "^2.31.0"
-simplejson = "^3.19.1"
+tenacity = "^8.2.2"
 
 
 [build-system]
