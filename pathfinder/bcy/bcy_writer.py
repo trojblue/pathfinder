@@ -4,6 +4,7 @@ import logging
 from typing import Dict, Union
 from tqdm import tqdm
 from pathfinder.bcy import BcyJsonParser
+import polars as pl
 
 class BcyWriter:
     def __init__(self, directory: str, output_file: str):
@@ -36,20 +37,41 @@ class BcyWriter:
         if not data_dict:
             logging.warning("Data dictionary is empty. Skipping CSV creation.")
             return
-        with open(self.output_file, "w", newline="", encoding="utf-8") as csvfile:
-            header = ["date_rank"] + list(next(iter(data_dict.values())).keys())
-            writer = csv.DictWriter(csvfile, fieldnames=header)
-            writer.writeheader()
-            for date_rank, row in data_dict.items():
-                sanitized_row = {k: self._sanitize(str(v)) for k, v in row.items()}
-                sanitized_row["date_rank"] = date_rank
-                writer.writerow(sanitized_row)
 
-    def parse_and_save(self):
+        with open(self.output_file, "w", newline="", encoding="utf-8") as csvfile:
+            if data_dict:
+                header = ["date_rank"] + list(next(iter(data_dict.values())).keys())
+                writer = csv.DictWriter(csvfile, fieldnames=header, quoting=csv.QUOTE_ALL)
+                writer.writeheader()
+                for date_rank, row in data_dict.items():
+                    row["date_rank"] = date_rank
+                    writer.writerow(row)
+
+    def save_dict_to_parquet(self, data_dict: dict, parquet_file: str):
+        """
+        Save a dictionary to a Parquet file using Polars.
+        :param data_dict: dictionary to be saved
+        :param parquet_file: name of the output Parquet file
+        """
+        if data_dict:
+            # Convert the dictionary to a DataFrame
+            df = pl.DataFrame(data_dict)
+
+            # Write the DataFrame to a Parquet file
+            df.write_parquet(parquet_file)
+        else:
+            raise ValueError("Empty dictionary passed.")
+    def parse_and_save(self, use_parquet: bool = False):
         if os.path.isfile(self.directory):
             data_dict = self.transform_json(self.directory)
         else:
             data_dict = self.transform_directory_jsons()
-        logging.info(f"Saving to {self.output_file}")
-        self.save_dict_to_csv(data_dict)
+
+        if use_parquet:
+            parquet_file = self.output_file.replace(".csv", ".parquet")
+            logging.info(f"Saving to {parquet_file}")
+            self.save_dict_to_parquet(data_dict, parquet_file)
+        else:
+            logging.info(f"Saving to {self.output_file}")
+            self.save_dict_to_csv(data_dict)
         logging.info("Done")
