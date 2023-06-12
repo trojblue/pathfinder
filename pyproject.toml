@@ -12,6 +12,8 @@ selenium = "^4.10.0"
 requests = "^2.31.0"
 tenacity = "^8.2.2"
 fire = "^0.5.0"
+orjson = "^3.9.1"
+tqdm = "^4.65.0"
 
 
 [build-system]
