@@ -40,4 +40,5 @@ def main(
 
 
 if __name__ == "__main__":
+    # python3 bcy_runner.py --start_date="20220610" --end_date="20230610" --target_dir="jsons"
     Fire(main)

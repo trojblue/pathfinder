@@ -59,6 +59,8 @@ def save_dict_to_csv(data_dict: dict, output_file: str):
 def do_parse_json(json_path: str, output_path: str = "output.csv"):
     """
     Parse a single JSON file and save it to a CSV file
+    :param json_path: Path to the JSON file, or directory
+    :param output_path: Path to the output CSV file
     """
     # if is a file
     if os.path.isfile(json_path):
