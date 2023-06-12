@@ -13,6 +13,7 @@ def main(start_date: str = "20230101", end_date: str = "20230612", target_dir: s
         for n in range(int((end_date - start_date).days) + 1):
             yield start_date + timedelta(n)
 
+    start_date, end_date = str(start_date), str(end_date)
 
     start_datetime = datetime.strptime(start_date, "%Y%m%d")
     end_datetime = datetime.strptime(end_date, "%Y%m%d")
