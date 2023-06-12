@@ -56,10 +56,16 @@ class BcyWriter:
         """
         if data_dict:
             # Convert the dictionary to a pandas DataFrame first
-            df_pandas = pd.DataFrame.from_dict(data_dict, orient='index')
+            df_pandas = pd.DataFrame.from_dict(data_dict, orient='index').reset_index()
+
+            # Rename the 'index' column to 'date_rank'
+            df_pandas.rename(columns={'index': 'date_rank'}, inplace=True)
 
             # Then convert pandas DataFrame to Polars DataFrame
             df = pl.from_pandas(df_pandas)
+
+            # Rearrange the columns to have 'date_rank' first
+            df = df.select(['date_rank'] + [col for col in df.columns if col != 'date_rank'])
 
             # Write the DataFrame to a Parquet file
             df.write_parquet(parquet_file)
