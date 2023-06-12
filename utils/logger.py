@@ -27,16 +27,21 @@ class PipelineLogger:
         self.logger = logging.getLogger(__name__)
     """
 
-    def __init__(self, output_dir: str = "logs", file_suffix: str = "log", verbose: bool = True, logger_name: str = None):
-
+    def __init__(
+        self,
+        output_dir: str = "logs",
+        file_suffix: str = "log",
+        verbose: bool = True,
+        logger_name: str = None,
+    ):
         self.output_dir = Path(output_dir)
         self.log_file_suffix = file_suffix
         self.verbose = verbose
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.log_file = (
-                self.output_dir
-                / f"{self.log_file_suffix}_{datetime.now().strftime('%Y%m%d')}.log"
+            self.output_dir
+            / f"{self.log_file_suffix}_{datetime.now().strftime('%Y%m%d')}.log"
         )
 
         handlers = [logging.FileHandler(self.log_file, mode="a", encoding="utf-8")]
@@ -47,7 +52,9 @@ class PipelineLogger:
         else:
             log_level = logging.INFO
 
-        self.logger = logging.getLogger(logger_name if logger_name else self.__class__.__name__)
+        self.logger = logging.getLogger(
+            logger_name if logger_name else self.__class__.__name__
+        )
         self.logger.setLevel(log_level)
 
         # Check if handlers already exist before adding them; prevents duplicate handlers in Jupyter notebooks
@@ -57,12 +64,16 @@ class PipelineLogger:
             if verbose:
                 handlers.append(logging.StreamHandler())
 
-            formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+            formatter = logging.Formatter(
+                "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+            )
             for handler in handlers:
                 handler.setFormatter(formatter)
                 self.logger.addHandler(handler)
 
-        formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        )
         for handler in handlers:
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
@@ -101,4 +112,3 @@ class PipelineLogger:
 
     def info(self, message: str):
         self.log("INFO", message)
-
