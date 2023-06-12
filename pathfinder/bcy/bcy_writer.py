@@ -4,6 +4,7 @@ import logging
 from typing import Dict, Union
 from tqdm import tqdm
 from pathfinder.bcy import BcyJsonParser
+import pandas as pd
 import polars as pl
 
 class BcyWriter:
@@ -54,14 +55,21 @@ class BcyWriter:
         :param parquet_file: name of the output Parquet file
         """
         if data_dict:
-            # Convert the dictionary to a DataFrame
-            df = pl.DataFrame(data_dict)
+            # Convert the dictionary to a pandas DataFrame first
+            df_pandas = pd.DataFrame.from_dict(data_dict, orient='index')
+
+            # Then convert pandas DataFrame to Polars DataFrame
+            df = pl.from_pandas(df_pandas)
 
             # Write the DataFrame to a Parquet file
             df.write_parquet(parquet_file)
         else:
             raise ValueError("Empty dictionary passed.")
-    def parse_and_save(self, use_parquet: bool = False):
+
+    def parse_and_save(self, use_parquet: bool = True):
+        """
+        Parse the JSON file(s) and save the results to a CSV file or Parquet file.
+        """
         if os.path.isfile(self.directory):
             data_dict = self.transform_json(self.directory)
         else:

@@ -27,8 +27,7 @@ class BcyJsonParser:
     CURR_DETAIL_KEYS = ["rank", "stime", "count", "wave"]
 
     def __init__(self, target_dir: str = "jsons"):
-        self.target_dir = target_dir
-        os.makedirs(target_dir, exist_ok=True)
+        self.target_dir = target_dir  # <- useless?
 
     def _load_json(self, file_path: str) -> dict:
         """Loads JSON data from a file and returns it.

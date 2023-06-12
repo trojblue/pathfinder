@@ -1,6 +1,7 @@
 results
 *.csv
 *.json
+*.parquet
 
 # ==========
 

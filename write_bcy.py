@@ -2,7 +2,7 @@ import os
 import fire
 from pathfinder.bcy import BcyWriter
 
-def run(directory: str, output_file: str = "output.csv", use_parquet: bool = False):
+def run(directory: str, output_file: str = "output.csv", use_parquet: bool = True):
     """
     Parse a single JSON file or all JSON files in a directory and save the data to a CSV file.
     :param directory: Path to the JSON file or directory
