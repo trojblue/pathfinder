@@ -16,14 +16,14 @@ logging.basicConfig(level=logging.DEBUG)
 
 class BcyAPI:
     # threads = cpu_count() * 3
-    threads = 1
+    threads = 12
 
     def __init__(
         self,
         base_url="https://bcy.net",
         endpoint="/apiv3/rank/list/itemInfo",
-        short_break=(1, 0.1),
-        long_break=(5, 0.5),
+        short_break=(0.25, 0.01),
+        long_break=(0.5, 0.05),
         fraction_break=(0.1, 0.01),
     ):
         """Initialization method."""
