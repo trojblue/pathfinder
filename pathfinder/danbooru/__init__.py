@@ -1,1 +1,1 @@
-from dbr_get_meta import DanbooruMetadataFetcher
+from .dbr_get_meta import DanbooruMetadataFetcher
