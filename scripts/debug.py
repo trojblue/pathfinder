@@ -39,5 +39,16 @@ def try_single_page():
     api = BcyAPI()
     api.fetch_data([params], target_dir="")
 
+
+
+
+
 if __name__ == "__main__":
-    try_parse_csv()
+    pass
+    # reads json from path
+
+    with open(r"D:\CSC\pathfinder\bcy_2015_2019\illust_week_20150920_1.json", "r", encoding="utf-8") as f:
+        data = f.read()
+
+
+
