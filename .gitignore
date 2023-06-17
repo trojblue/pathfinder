@@ -2,7 +2,9 @@ results
 *.csv
 *.json
 *.parquet
+*.jsonl
 DATA
+
 # ==========
 
 # Byte-compiled / optimized / DLL files

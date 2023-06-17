@@ -7,14 +7,15 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from tqdm.auto import tqdm
 
 class DanbooruMetadataFetcher:
-    def __init__(self, start_index: int, end_index: int, num_workers: int = 5):
+    def __init__(self, start_index: int, end_index: int, num_workers: int = 1, delay:float=0.017):
         self.start_index = start_index
         self.end_index = end_index
         self.num_workers = num_workers
         self.sema = asyncio.BoundedSemaphore(num_workers)
+        self.delay = delay
         self.posts_url = "https://danbooru.donmai.us/posts/{index}.json"
 
-    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(reraise=True, stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=4, max=10))
     async def fetch_metadata(self, index: int, session: aiohttp.ClientSession) -> Optional[dict]:
         """Fetch metadata for a single post."""
         url = self.posts_url.format(index=index)
@@ -22,7 +23,16 @@ class DanbooruMetadataFetcher:
 
         async with self.sema, session.get(url, headers=headers) as response:
             if response.status == 200:
+                await asyncio.sleep(self.delay)
                 return await response.json()
+            elif response.status == 429:
+                # print(f"Rate limited at: {index}")
+                await asyncio.sleep(1)  # start with a delay of 1 second
+                raise Exception(f"Rate limit exceeded at index {index}")
+            else:
+                print(f"Received status code {response.status} for index {index}")
+                body = await response.text()
+                print(f"Response body: {body}")
             return None
 
     async def progress_wrapper(self, coro, pbar):

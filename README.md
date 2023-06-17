@@ -38,3 +38,8 @@ export bcy json files as a single csv / parquet file:
 # saves to <curr_dir>/bcy_2015_2019.parquet
 python write_bcy.py D:\CSC\pathfinder\bcy_2015_2019
 ```
+
+download danbooru metadata, from id 6408262 to 6000000, with 4 threads:
+```bash
+python run_dbr.py 6408262 6000000 -n 1
+```
