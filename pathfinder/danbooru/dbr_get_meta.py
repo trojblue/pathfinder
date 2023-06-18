@@ -53,22 +53,22 @@ class DanbooruMetadataFetcher:
 
     async def fetch_all_metadata(self, output_filename: str) -> None:
         """Fetch metadata for all posts in the specified range and save progress every 5000 posts."""
-        indices = (i for i in range(self.start_index, self.end_index - 1, -1)) if self.start_index > self.end_index else range(self.start_index, self.end_index + 1)
+        indices = (i for i in
+                   range(self.start_index, self.end_index - 1, -1)) if self.start_index > self.end_index else range(
+            self.start_index, self.end_index + 1)
         output_path = Path(output_filename)
         async with aiohttp.ClientSession() as session:
             with tqdm(total=abs(self.start_index - self.end_index), desc="Fetching metadata") as pbar:
                 tasks = []
-                results = []
                 for index in indices:
                     tasks.append(self.progress_wrapper(self.fetch_metadata(index, session), pbar))
                     if len(tasks) == 5000:
                         partial_results = await asyncio.gather(*tasks, return_exceptions=True)
-                        results.extend(partial_results)
                         await self.save_progress(partial_results, output_path)
-                        tasks = []
+                        tasks = []  # Clear the tasks list
+
                 if tasks:  # handle any remaining tasks
                     partial_results = await asyncio.gather(*tasks, return_exceptions=True)
-                    results.extend(partial_results)
                     await self.save_progress(partial_results, output_path)
 
     def fetch_and_save(self, output_filename: str):
