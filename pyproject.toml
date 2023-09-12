@@ -18,7 +18,7 @@ polars = "^0.18.2"
 pandas = "^2.0.2"
 pyarrow = "^12.0.0"
 aiohttp = "^3.8.4"
-unibox = {url = "https://files.pythonhosted.org/packages/40/b9/d08300b70094eb0dfbf418444784997fd690e643ec10cd895f9ccf8e6249/unibox-0.2.13-py3-none-any.whl"}
+unibox = "^0.3.0"
 
 
 [build-system]
