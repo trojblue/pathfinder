@@ -1,4 +1,4 @@
-from pathfinder.sekai.extract_sekai import *
+from pathfinder.sekai.sekai_extract import *
 
 
 def explore():
