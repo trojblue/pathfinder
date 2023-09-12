@@ -118,22 +118,17 @@ def download_files_from_url_tup(
 # --- Main Functions ---
 
 
-def scrape_by_prefix(prefix: str):
-    """Scrape a single prefix. Assumes that no subdirectories exist."""
-    try:
-        url = generate_url(prefix)
-        xml_content = fetch_url(url)
-        extracted_file_urls = extract_file_urls(xml_content, BASE_URL)
-        download_files_from_url_tup(extracted_file_urls, r"E:\sekai")
-        print(f"Scraped {prefix}")
-    except Exception as e:
-        print(f"Failed to scrape prefix {prefix}. Exception: {e}")
-
-
-def scrape_by_prefixes(prefixes: List[str]):
+def scrape_prefixes(prefixes: List[str]):
     """Scrape multiple prefixes."""
     for prefix in tqdm(prefixes):
-        scrape_by_prefix(prefix)
+        try:
+            url = generate_url(prefix)
+            xml_content = fetch_url(url)
+            extracted_file_urls = extract_file_urls(xml_content, BASE_URL)
+            download_files_from_url_tup(extracted_file_urls, r"E:\sekai")
+            print(f"Scraped {prefix}")
+        except Exception as e:
+            print(f"Failed to scrape prefix {prefix}. Exception: {e}")
 
 
 # --- Example usage ---
@@ -144,7 +139,7 @@ def scrape_driver(todo_txt_path: str):
     with open(todo_txt_path, "r") as f:
         prefixes = f.readlines()
     prefixes = [prefix.strip() for prefix in prefixes]
-    scrape_by_prefixes(prefixes)
+    scrape_prefixes(prefixes)
 
 
 if __name__ == "__main__":
