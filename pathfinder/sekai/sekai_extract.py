@@ -118,14 +118,14 @@ def download_files_from_url_tup(
 # --- Main Functions ---
 
 
-def scrape_prefixes(prefixes: List[str]):
+def scrape_prefixes(prefixes: List[str], save_dir: str):
     """Scrape multiple prefixes."""
     for prefix in tqdm(prefixes):
         try:
             url = generate_url(prefix)
             xml_content = fetch_url(url)
             extracted_file_urls = extract_file_urls(xml_content, BASE_URL)
-            download_files_from_url_tup(extracted_file_urls, r"E:\sekai")
+            download_files_from_url_tup(extracted_file_urls, save_dir)
             print(f"Scraped {prefix}")
         except Exception as e:
             print(f"Failed to scrape prefix {prefix}. Exception: {e}")
@@ -134,19 +134,16 @@ def scrape_prefixes(prefixes: List[str]):
 # --- Example usage ---
 
 
-def scrape_driver(todo_txt_path: str):
+def scrape_driver(todo_txt_path: str, save_dir: str = "./sekai"):
     # reads a txt file containing prefixes in to a list
     with open(todo_txt_path, "r") as f:
         prefixes = f.readlines()
     prefixes = [prefix.strip() for prefix in prefixes]
-    scrape_prefixes(prefixes)
+    scrape_prefixes(prefixes, save_dir)
 
 
 if __name__ == "__main__":
-    # Uncomment this if you want to run the 'parse_xmls_to_prefix' function.
-    # parse_xmls_to_prefix()
+    # todo_txt_path = r"D:\CSC\pathfinder\_data_sync\sekai_voice_prefix_list.txt"
 
-    todo_txt_path = r"D:\CSC\pathfinder\_data_sync\sekai_voice_prefix_list.txt"
-    # scrape_driver(todo_txt_path)
-
+    # python sekai_extract.py scrape_driver --todo_txt_path sekai_voice_prefix_list.txt --save_dir ./sekai
     fire.Fire(scrape_driver)
