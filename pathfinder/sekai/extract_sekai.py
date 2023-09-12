@@ -1,20 +1,16 @@
 # Importing required libraries
-import requests
-import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
+from xml.etree.ElementTree import fromstring
+from pathlib import Path
+from typing import List, Tuple
+import requests
+import os
+from tqdm.auto import tqdm
 
-import unibox
+# Constants
+BASE_URL = "https://storage.sekai.best/sekai-assets/"
 
-
-def parse_xml(xml_content: str, namespace=None) -> list:
-    """Parse XML to extract 'CommonPrefixes'."""
-    if namespace is None:
-        namespace = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
-    root = ET.fromstring(xml_content)
-    return [
-        cp.find("s3:Prefix", namespace).text
-        for cp in root.findall(".//s3:CommonPrefixes", namespace)
-    ]
+# --- Network Operations ---
 
 
 def fetch_url(url: str) -> str:
@@ -28,37 +24,95 @@ def fetch_url(url: str) -> str:
 
 
 def generate_url(prefix: str, max_keys: int = 1000) -> str:
-    """
-    Generate an S3 URL with query parameters.
-    >>> generate_url("sound/", 600)
-    >>> "https://storage.sekai.best/sekai-assets/?delimiter=%2F&list-type=2&max-keys=500&prefix=sound%2F"
-    """
-    base_url = "https://storage.sekai.best/sekai-assets/"
-    delimiter = "/"
-    list_type = 2
-
+    """Generate an S3 URL with query parameters."""
     params = {
-        "delimiter": delimiter,
-        "list-type": list_type,
+        "delimiter": "/",
+        "list-type": 2,
         "max-keys": max_keys,
         "prefix": prefix,
     }
-    return f"{base_url}?{urlencode(params)}"
+    return f"{BASE_URL}?{urlencode(params)}"
 
 
-def try_it():
-    url = generate_url("sound/scenario/voice/")
+# --- XML Parsing ---
+
+
+def parse_xml(xml_content: str, namespace=None) -> list:
+    """Parse XML to extract 'CommonPrefixes'."""
+    if namespace is None:
+        namespace = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
+    root = fromstring(xml_content)
+    return [
+        cp.find("s3:Prefix", namespace).text
+        for cp in root.findall(".//s3:CommonPrefixes", namespace)
+    ]
+
+
+def extract_file_urls(
+    xml_content: str, base_url: str, namespace=None
+) -> List[Tuple[str, str]]:
+    """Extract file URLs from given XML content."""
+    if namespace is None:
+        namespace = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
+
+    root = fromstring(xml_content)
+    file_keys = [
+        content.find("s3:Key", namespace).text
+        for content in root.findall(".//s3:Contents", namespace)
+    ]
+    return [(key, f"{base_url}/{key}") for key in file_keys]
+
+
+# --- File Operations ---
+
+
+def download_files_from_url_tup(
+    url_tuples: List[Tuple[str, str]], root_dir: str
+) -> None:
+    """Download files from the given URLs into a local directory."""
+    for rel_path, url in url_tuples:
+        target_path = Path(root_dir) / rel_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+
+        response = requests.get(url)
+        if response.status_code == 200:
+            with open(target_path, "wb") as f:
+                f.write(response.content)
+        else:
+            print(f"Failed to download {url}. Status code: {response.status_code}")
+
+
+# --- Main Functions ---
+
+
+def scrape_by_prefix(prefix: str):
+    """Scrape a single prefix. Assumes that no subdirectories exist."""
+    url = generate_url(prefix)
     xml_content = fetch_url(url)
-    common_prefixes = parse_xml(xml_content)
-    print(common_prefixes)
+    extracted_file_urls = extract_file_urls(xml_content, BASE_URL)
+    download_files_from_url_tup(extracted_file_urls, r"E:\sekai")
+    print(f"Scraped {prefix}")
 
 
-def parse_xmls():
-    xml_paths = unibox.traverses()
+def scrape_by_prefixes(prefixes: List[str]):
+    """Scrape multiple prefixes."""
+    for prefix in tqdm(prefixes):
+        scrape_by_prefix(prefix)
 
-    pass
+
+# --- Example usage ---
 
 
-# Example usage
+def scrape_driver():
+    # reads a txt file containing prefixes in to a list
+    with open(r"D:\CSC\pathfinder\_data_sync\sekai_voice_prefix_list.txt", "r") as f:
+        prefixes = f.readlines()
+    prefixes = [prefix.strip() for prefix in prefixes]
+    scrape_by_prefixes(prefixes)
+
+
 if __name__ == "__main__":
-    parse_xmls()
+    # Uncomment this if you want to run the 'parse_xmls_to_prefix' function.
+    # parse_xmls_to_prefix()
+
+    scrape_driver()
