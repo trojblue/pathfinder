@@ -6,6 +6,9 @@ from typing import List, Tuple
 import requests
 import os
 from tqdm.auto import tqdm
+from tenacity import retry, stop_after_attempt, wait_fixed
+from threading import Thread, Lock
+
 
 # Constants
 BASE_URL = "https://storage.sekai.best/sekai-assets/"
@@ -66,20 +69,44 @@ def extract_file_urls(
 # --- File Operations ---
 
 
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+def download_file(
+    rel_path: str, url: str, root_dir: str, tqdm_lock: Lock, pbar: tqdm
+) -> None:
+    """Download a single file with retry logic."""
+    target_path = Path(root_dir) / rel_path
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(target_path, "wb") as f:
+            f.write(response.content)
+        with tqdm_lock:
+            pbar.update(1)
+    else:
+        raise ConnectionError(
+            f"Failed to download {url}. Status code: {response.status_code}"
+        )
+
+
 def download_files_from_url_tup(
     url_tuples: List[Tuple[str, str]], root_dir: str
 ) -> None:
-    """Download files from the given URLs into a local directory."""
-    for rel_path, url in url_tuples:
-        target_path = Path(root_dir) / rel_path
-        target_path.parent.mkdir(parents=True, exist_ok=True)
+    """Download files from the given URLs into a local directory using threading."""
 
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(target_path, "wb") as f:
-                f.write(response.content)
-        else:
-            print(f"Failed to download {url}. Status code: {response.status_code}")
+    threads = []
+    tqdm_lock = Lock()
+
+    with tqdm(total=len(url_tuples)) as pbar:
+        for rel_path, url in url_tuples:
+            thread = Thread(
+                target=download_file, args=(rel_path, url, root_dir, tqdm_lock, pbar)
+            )
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
 
 
 # --- Main Functions ---
