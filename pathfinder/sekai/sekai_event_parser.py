@@ -55,14 +55,24 @@ def extract_single_asset_file(file_path: str, display_name: str) -> List[dict]:
 
 
 def driver():
+    def _save_jsonl(data: list, file_path):
+        with open(file_path, "w", encoding="utf-8") as f:
+            for item in data:
+                json.dump(item, f, ensure_ascii=False)
+                f.write('\n')
+
+
     root_dir = r"E:\sekai\event_story"
-    display_name = "奏"
+    display_name = "ネネロボ"
 
     asset_files = unibox.traverses(root_dir, include_extensions=[".asset"])
     all_dicts = []
     for asset_file in tqdm(asset_files):
         dicts = extract_single_asset_file(asset_file, display_name)
         all_dicts.extend(dicts)
+
+
+    _save_jsonl(all_dicts, "dict_temp.jsonl")
 
     zou_only_id_list = []
 
@@ -71,7 +81,7 @@ def driver():
             zou_only_id_list.append(i["Voices_VoiceId"])
 
     # save to jsonl
-    unibox.saves(zou_only_id_list, "zou_only_id_list.txt")
+    unibox.saves(zou_only_id_list, "kanade_audio_id_list.txt")
 
 
 if __name__ == "__main__":
