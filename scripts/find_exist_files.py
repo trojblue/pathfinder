@@ -4,7 +4,7 @@ import shutil
 
 if __name__ == '__main__':
     f1_str = r"E:\sekai\kanade_audio_copy"
-    f2_str = r"E:\sekai\kanade_audio_flac_16bit_48k_poly-sinc-ext3"
+    f2_str = r"E:\sekai\kanade_audio_flac_16bit_48k_poly-sinc-ext3_rerun"
 
     f1 = unibox.traverses(f1_str, include_extensions=[".mp3"])
     f2 = unibox.traverses(f2_str, include_extensions=[".flac"])

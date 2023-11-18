@@ -1,3 +1,14 @@
+# sekai.best
+
+## structure
+
+- event_parser: 根据关键词提取需要的audio id
+- 
+
+
+
+
+
 ## Sekai API
 
 
