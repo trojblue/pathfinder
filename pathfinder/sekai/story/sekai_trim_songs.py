@@ -17,7 +17,7 @@ def trim(source_dir, dest_dir):
             # Cut off the first 7 seconds
             audio = audio[8950:]  # pydub works in milliseconds
 
-            # Save the modified audio in the destination folder
+            # Save the modified story in the destination folder
             audio.export(os.path.join(dest_dir, filename), format="flac")
 
     print("Processing complete.")

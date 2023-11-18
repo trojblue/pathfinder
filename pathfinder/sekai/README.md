@@ -3,7 +3,17 @@
 ## structure
 
 - event_parser: 根据关键词提取需要的audio id
-- 
+
+
+
+
+
+## Usage
+
+
+
+1. 找到要爬的目录: eg. `https://sekai.best/asset_viewer/character/member`
+2. 
 
 
 

@@ -1,5 +1,5 @@
 import unibox
-from pathfinder.sekai.sekai_extract import *
+from pathfinder.sekai.sekai_extractor import *
 
 """
 输入相对路径 eg."event_story" -> https://sekai.best/asset_viewer/event_story/
@@ -22,18 +22,10 @@ def parse_xmls_to_prefix():
     unibox.saves(prefix_list, r"sekai_voice_prefix_list.txt")
 
 
-def parse_entry(entry_path):
-    """Parse all XMLs in a directory into scrapable prefixes.
-    :param entry_path: The path to the entry file. eg."sound/scenario/voice/"
-    """
-    url = generate_url(entry_path)
-    xml_content = fetch_url(url)
-    common_prefixes = parse_xml(xml_content)
 
-    unibox.saves(common_prefixes, f"{entry_path.replace('/', '_')}_prefix_list.txt")
-    print(common_prefixes)
 
 
 if __name__ == "__main__":
+    pass
     # parse_xmls_to_prefix()
-    parse_entry("event_story/")
+    # parse_entry("event_story/")

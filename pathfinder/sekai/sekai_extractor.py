@@ -29,7 +29,11 @@ def fetch_url(url: str) -> str:
 
 
 def generate_url(prefix: str, max_keys: int = 1000) -> str:
-    """Generate an S3 URL with query parameters."""
+    """Generate an S3 URL with query parameters.
+    输入文件目录prefix, 返回用来获取文件列表的url
+    eg. https://sekai.best/asset_viewer/character/member
+    prefix = "character/member"
+    """
     params = {
         "delimiter": "/",
         "list-type": 2,
@@ -43,17 +47,32 @@ def generate_url(prefix: str, max_keys: int = 1000) -> str:
 
 
 def parse_xml(xml_content: str, namespace=None) -> list:
-    """Parse XML to extract 'CommonPrefixes'."""
+    """
+    Parse XML to extract 'CommonPrefixes' or 'Key' values from 'Contents' elements.
+    It first tries to find 'CommonPrefixes'. If none are found, it extracts 'Key' values from 'Contents'.
+    """
     try:
         if namespace is None:
             namespace = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
         root = fromstring(xml_content)
-        return [
+
+        # Try to extract CommonPrefixes
+        common_prefixes = [
             cp.find("s3:Prefix", namespace).text
             for cp in root.findall(".//s3:CommonPrefixes", namespace)
         ]
+
+        if common_prefixes:
+            return common_prefixes
+
+        # If no CommonPrefixes, extract Key values from Contents
+        return [
+            contents.find("s3:Key", namespace).text
+            for contents in root.findall(".//s3:Contents", namespace)
+        ]
     except ParseError as e:
         return [f"XML Parsing failed: {e}"]
+
 
 
 def extract_file_urls(
@@ -95,19 +114,15 @@ def download_file(
         raise ConnectionError(f"Failed to download {url}. Exception: {e}")
 
 
-def download_files_from_url_tup(
-    url_tuples: List[Tuple[str, str]], root_dir: str
-) -> None:
+def download_files_from_urls(file_urls: list[str], root_dir: str, base_url: str) -> None:
     """Download files from the given URLs into a local directory using threading."""
 
     threads = []
     tqdm_lock = Lock()
 
-    with tqdm(total=len(url_tuples)) as pbar:
-        for rel_path, url in url_tuples:
-            thread = Thread(
-                target=download_file, args=(rel_path, url, root_dir, tqdm_lock, pbar)
-            )
+    with tqdm(total=len(file_urls)) as pbar:
+        for file_url in file_urls:
+            thread = Thread(target=download_file, args=(file_url, root_dir, tqdm_lock, pbar))
             thread.start()
             threads.append(thread)
 
@@ -145,5 +160,5 @@ def scrape_driver(todo_txt_path: str, save_dir: str = "./sekai"):
 if __name__ == "__main__":
     # todo_txt_path = r"D:\CSC\pathfinder\_data_sync\sekai_voice_prefix_list.txt"
 
-    # python sekai_extract.py scrape_driver --todo_txt_path sekai_voice_prefix_list.txt --save_dir ./sekai
+    # python sekai_extractor.py scrape_driver --todo_txt_path sekai_voice_prefix_list.txt --save_dir ./sekai
     fire.Fire(scrape_driver)
