@@ -1,39 +1,10 @@
-from tqdm import tqdm
-import unibox
-from pathfinder.sekai.sekai_extractor import *
-from pydub import AudioSegment
 import os
-
-def explore_voice():
-    URL = "sound/actionset/voice/"
-    url = generate_url(URL)
-    xml_content = fetch_url(url)
-    extracted_file_urls = extract_file_urls(xml_content, BASE_URL)
-
-    print(extracted_file_urls)
+from tqdm import tqdm
+from pathfinder.sekai.sekai_extractor import *
+from pathfinder.utils.file_downloader import URLDownloader
 
 
-def calculate_total_audio_length(directory: str) -> float:
-    """Calculate the total length of all mp3 files in the given directory."""
-    total_length = 0.0  # Total length in seconds
-    for filename in tqdm(os.listdir(directory)):
-        if filename.endswith('.mp3'):
-            audio = AudioSegment.from_mp3(os.path.join(directory, filename))
-            total_length += len(audio) / 1000.0  # Convert length to seconds
-    print(f"Total length of audio in {directory}: {total_length} seconds")
-    return total_length
-
-
-def explore_4star_cards():
-    URL = "character/member/"
-    url = generate_url(URL)
-    xml_content = fetch_url(url)
-    extracted_file_urls = extract_file_urls(xml_content, BASE_URL)
-
-    print("D")
-
-
-def extract_subfolder_prefixes(directory_path:str) -> list[str]:
+def extract_subfolder_prefixes(directory_path: str) -> list[str]:
     """
     输入一个sekai站的相对路径, 返回所有下面的直接子文件夹的前缀
     Parse all XMLs in a directory into scrapable prefixes.
@@ -64,24 +35,22 @@ def gatcha_card_extract_driver():
     """
     从gatcha_card/中提取所有卡的前缀
     """
+    downloader = URLDownloader(show_tqdm=False)
+    SAVE_ROOT_DIR = r"E:\sekai\gatcha_card"
+
+    # get all sub-folders under character/member/
     prefix_list = extract_subfolder_prefixes("character/member/")
 
-    for curr_prefix in prefix_list:
+    for curr_prefix in tqdm(prefix_list, desc="Downloading gatcha card items"):
         curr_entries = extract_subfolder_prefixes(curr_prefix)
         file_urls = construct_file_urls(curr_entries, BASE_URL)
 
-        # download somewhere
-        # download_files_from_url_tup(file_urls, r"E:\sekai\gatcha_card")
+        # download files to ROOT_DIR/{last_folder_name} (eg. D:/res001_no001_rip)
+        last_folder_name = curr_prefix.rstrip("/").split("/")[-1]
+        curr_download_dir = os.path.join(SAVE_ROOT_DIR, last_folder_name)
 
-        print("D")
-
-
-
+        downloader.download_files(file_urls, curr_download_dir)
 
 
 if __name__ == "__main__":
-    # explore_voice()
-    # calculate_total_audio_length(r"E:\sekai\kanade_audio_copy")
-    # explore_4star_cards()
-    # extract_subfolder_prefixes("character/member/")
     gatcha_card_extract_driver()

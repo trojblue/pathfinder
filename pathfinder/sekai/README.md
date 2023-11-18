@@ -12,8 +12,15 @@
 
 
 
-1. 找到要爬的目录: eg. `https://sekai.best/asset_viewer/character/member`
-2. 
+getting character card details: `gatcha_card_extract_driver()`
+
+
+
+
+
+
+
+
 
 
 
