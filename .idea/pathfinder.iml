@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/DATA/bcy_2015-2023_illust" />
       <excludeFolder url="file://$MODULE_DIR$/bcy_2015-2023_novel" />
     </content>
-    <orderEntry type="jdk" jdkName="Poetry (pathfinder)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
