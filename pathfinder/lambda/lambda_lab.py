@@ -30,6 +30,7 @@ class LambdaInstanceLauncher():
     """
 
     API_BASE_URL = "https://cloud.lambdalabs.com/api/v1"
+    REQUEST_TIMEOUT_SLEEP_TIME = 20
 
     def __init__(self, ssh_key_names: list, api_key_file: str):
         self.logger = ub.UniLogger()
@@ -49,6 +50,9 @@ class LambdaInstanceLauncher():
         except requests.RequestException as e:
             self.logger.error(f"Request error: {e}")
             return None
+        except requests.exceptions.JSONDecodeError:
+            self.logger.error(f"Response JSON decode error, sleeping {self.REQUEST_TIMEOUT_SLEEP_TIME} seconds")
+            time.sleep(self.REQUEST_TIMEOUT_SLEEP_TIME)
 
     def get_instance_types(self):
         headers = {"Authorization": f"Bearer {self.api_key}"}
@@ -81,7 +85,7 @@ class LambdaInstanceLauncher():
                 self.logger.info(f"launch_response: {launch_response}")
                 exit(0)
 
-    def snipe_instances(self, instance_types_list, sleep_time = 0.2):
+    def snipe_instances(self, instance_types_list, sleep_time = 1):
         self.logger.info(f"sniping instances from {instance_types_list}")
         pbar = tqdm(desc=f"sniping instances")
         while True:
@@ -92,7 +96,7 @@ class LambdaInstanceLauncher():
 def launch_instance():
     launcher = LambdaInstanceLauncher(ssh_key_names=["yada"], api_key_file="yada-api-key2.txt")
     snipe_list = ["gpu_1x_h100_pcie", "gpu_1x_a100", "gpu_1x_a100_sxm4"]
-    launcher._snipe_instances(snipe_list)
+    launcher.snipe_instances(snipe_list)
 
 
 if __name__ == '__main__':
