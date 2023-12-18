@@ -79,6 +79,7 @@ class LambdaInstanceLauncher():
             curr_available_regions = curr_meta["regions_with_capacity_available"]
 
             if curr_available_regions:
+                self.logger.info(f"INSTANCE AVAILABLE: [{instance_type}] at [{curr_available_regions}]")
                 launch_region_name = curr_available_regions[0]["name"]
                 launch_response = self.launch_instance(launch_region_name, instance_type,
                                                        self.ssh_key_names, quantity=1, node_name="auto_launched_node")
